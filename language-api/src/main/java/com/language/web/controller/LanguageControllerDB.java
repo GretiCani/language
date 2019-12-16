@@ -74,6 +74,12 @@ public class LanguageControllerDB {
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deleteKey(@RequestParam String key){
+        languageService.deleteKeys(key);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
   @PostMapping("/import")
   public ResponseEntity<Void> importLanguage(@RequestParam String name,@RequestParam MultipartFile file)throws IOException {
       languageService.importLanguageCsv(name,file);

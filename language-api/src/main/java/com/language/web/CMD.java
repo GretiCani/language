@@ -29,28 +29,12 @@ public class CMD implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
 
-//        List<Translation> translations;
-//        Language language = new Language();
-//        File file = ResourceUtils.getFile("classpath:language-sample.csv");
-//        System.err.println(file.getName());
-//        try (Reader reader=new FileReader(file)){
-//            CsvToBean<Translation> translationCsvToBean = new CsvToBeanBuilder<Translation>(reader)
-//                    .withType(Translation.class)
-//                    .withIgnoreLeadingWhiteSpace(true).build();
-//            translations = translationCsvToBean.parse();
-//            language.setName("TestFromCsv");
-//            language.setTranslations(translations);
-//            languageRepository.save(language);
-//
-//        }
+        String key = "prop1";
+        languageService.deleteKeys(key);
 
+        }
 
-
-
-
-
-    }
 
 }

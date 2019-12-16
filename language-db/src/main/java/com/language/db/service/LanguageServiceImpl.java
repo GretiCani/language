@@ -10,6 +10,10 @@ import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +28,7 @@ import java.util.stream.Collectors;
 public class LanguageServiceImpl implements LanguageService {
 
     private final LanguageRepository languageRepository;
+    private final MongoTemplate mongoTemplate;
 
     @Override
     public Language find(String name) {
@@ -118,6 +123,14 @@ public class LanguageServiceImpl implements LanguageService {
             languageRepository.save(language);
 
         }
+    }
+
+    @Override
+    public void deleteKeys(String key) {
+        Query query = new Query(Criteria.where("translations")
+                .elemMatch(Criteria.where("key").is(key)));
+        Update update = new Update().pull("translations",new Query(Criteria.where("key").is(key)));
+        mongoTemplate.updateMulti(query,update,Language.class);
     }
 
     private File convertMultiPartToFile(MultipartFile file) throws IOException {
