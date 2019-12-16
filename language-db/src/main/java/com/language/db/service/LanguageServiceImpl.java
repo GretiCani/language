@@ -7,7 +7,6 @@ import com.language.model.Translation;
 import com.language.repository.LanguageRepository;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
-import com.opencsv.bean.StatefulBeanToCsv;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -44,38 +43,42 @@ public class LanguageServiceImpl implements LanguageService {
 
     @Override
     public Language add(Language language) {
+        if(language.getName()==null)
         return languageRepository.save(language);
+        else {
+            Language lang = languageRepository.findByName("english")
+                    .orElseThrow(()->new ResourceNotFoundException(String
+                            .format("Can't update language. Reason: language %S doesn't exist.")));
+
+            List<Translation> dublicatedKeys = new ArrayList<>();
+            for (Translation t : language.getTranslations()){
+                for (Translation l : lang.getTranslations())
+                    if(t.getKey().equals(l.getKey())){
+                        dublicatedKeys.add(t);
+                    }
+            }
+            language.getTranslations().removeAll(dublicatedKeys);
+            lang.getTranslations().addAll(language.getTranslations()
+                    .stream().collect(Collectors.toList()));
+
+            languageRepository.save(lang);
+
+            language.getTranslations().forEach(translation -> translation.setValue(""));
+
+            languageRepository.findAll().forEach(l -> {
+                if (!l.getName().equals("english")){
+                    l.getTranslations().addAll(language.getTranslations().stream().distinct().collect(Collectors.toList()));
+                    languageRepository.save(l);
+                }
+            });
+            return lang;
+        }
     }
 
     @Override
     public Language update(Language language) {
 
-         Language lang = languageRepository.findById(language.getId())
-                .orElseThrow(()->new ResourceNotFoundException(String
-                        .format("Can't update language. Reason: language %S doesn't exist.",language.getName())));
-
-        List<Translation> dublicatedKeys = new ArrayList<>();
-        for (Translation t : language.getTranslations()){
-            for (Translation l : lang.getTranslations())
-                if(t.getKey().equals(l.getKey())){
-                    dublicatedKeys.add(t);
-                }
-        }
-        language.getTranslations().removeAll(dublicatedKeys);
-        lang.getTranslations().addAll(language.getTranslations()
-                .stream().collect(Collectors.toList()));
-
-        languageRepository.save(lang);
-
-        language.getTranslations().forEach(translation -> translation.setValue(""));
-
-         languageRepository.findAll().forEach(l -> {
-                    if (!l.getName().equals(language.getName())){
-                        l.getTranslations().addAll(language.getTranslations().stream().distinct().collect(Collectors.toList()));
-                        languageRepository.save(l);
-                }
-         });
-        return lang;
+        return languageRepository.save(language);
     }
 
     @Override
@@ -96,7 +99,7 @@ public class LanguageServiceImpl implements LanguageService {
                 .stream().skip(pageRequest.getPageNumber()*pageRequest.getPageSize())
                 .limit(pageRequest.getPageSize())
                 .collect(Collectors.toList());
-        return PageableExecutionUtils.getPage(translations,pageRequest,()->0L);
+        return PageableExecutionUtils.getPage(translations,pageRequest,()->language.getTranslations().size());
     }
 
     @Override

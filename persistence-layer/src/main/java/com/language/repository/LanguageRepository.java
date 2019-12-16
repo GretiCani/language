@@ -16,4 +16,7 @@ public interface LanguageRepository extends MongoRepository<Language,String> {
 
     @Query(value = "{}", fields = "{ 'name' : 1 }")
     List<Language> getLanguagesName();
+
+    @Query(value = "{ 'userId' : ?0, 'questions.questionID' : ?1 }", fields = "{ 'questions.questionID' : 1 }")
+    Language updateKeyValue(String name,String key);
 }

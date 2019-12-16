@@ -32,9 +32,12 @@ public class LanguageControllerDB {
       return ResponseEntity.ok(languageService.findAll());
   }
 
-  @GetMapping("/{name}")
-  public ResponseEntity<Language> find(@PathVariable String name){
-      return ResponseEntity.ok(languageService.find(name));
+  @GetMapping("/find")
+  public ResponseEntity<Page<Translation>> find(@RequestParam(defaultValue = "10") Integer pageSize,
+                                       @RequestParam(defaultValue = "0") Integer pageIndex,
+                                       @RequestParam(name = "Language") String name){
+      Page<Translation> paginatedResult = languageService.findPaginated(name,PageRequest.of(pageIndex,pageSize));
+      return ResponseEntity.ok(paginatedResult);
   }
 
   @GetMapping("/names")
@@ -44,10 +47,10 @@ public class LanguageControllerDB {
   }
 
   @GetMapping("/")
-  public ResponseEntity<Page<Translation>> getLangByPage(@RequestParam(defaultValue = "0") Integer pageSize,
-                                                         @RequestParam(defaultValue = "10") Integer pageIndex,
+  public ResponseEntity<Page<Translation>> getLangByPage(@RequestParam(defaultValue = "1") Integer pageIndex,
+                                                         @RequestParam(defaultValue = "10") Integer pageSize,
                                                          @RequestParam String name){
-      Page<Translation> paginatedResult = languageService.findPaginated(name,PageRequest.of(pageSize,pageIndex));
+      Page<Translation> paginatedResult = languageService.findPaginated(name,PageRequest.of(pageIndex,pageSize));
       return ResponseEntity.ok(paginatedResult);
   }
 
@@ -72,7 +75,7 @@ public class LanguageControllerDB {
   }
 
   @PostMapping("/import")
-  public ResponseEntity<Void> importLanguage(@RequestBody String name,@RequestBody MultipartFile file)throws IOException {
+  public ResponseEntity<Void> importLanguage(@RequestParam String name,@RequestParam MultipartFile file)throws IOException {
       languageService.importLanguageCsv(name,file);
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
