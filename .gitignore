@@ -1,0 +1,5 @@
+# Project exclude paths
+/language-api/target/
+/language-db/target/
+/language-fs/target/
+/persistence-layer/target/

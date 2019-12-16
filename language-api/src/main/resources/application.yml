@@ -1,0 +1,11 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://rayonitUser:rayonit@rayonit-8yx5q.mongodb.net/language?retryWrites=true&w=majority
+      database: language
+server:
+  servlet:
+    context-path: /api
+language:
+    fs:
+      base_dir: /home/greti/spring/api/language/language-api/src/main/resources/language/
