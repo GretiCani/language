@@ -48,7 +48,8 @@ public class LanguageServiceImpl implements LanguageService {
 
     @Override
     public Language add(Language language) {
-        if(language.getName()==null)
+
+        if(language.getName()!=null && !language.getName().equals(""))
         return languageRepository.save(language);
         else {
             Language lang = languageRepository.findByName("english")

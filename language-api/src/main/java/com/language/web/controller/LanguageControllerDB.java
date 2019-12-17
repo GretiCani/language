@@ -32,13 +32,20 @@ public class LanguageControllerDB {
       return ResponseEntity.ok(languageService.findAll());
   }
 
-  @GetMapping("/find")
+  @GetMapping("/find/paginated")
   public ResponseEntity<Page<Translation>> find(@RequestParam(defaultValue = "10") Integer pageSize,
                                        @RequestParam(defaultValue = "0") Integer pageIndex,
                                        @RequestParam(name = "Language") String name){
       Page<Translation> paginatedResult = languageService.findPaginated(name,PageRequest.of(pageIndex,pageSize));
       return ResponseEntity.ok(paginatedResult);
   }
+
+    @GetMapping("/find")
+    public ResponseEntity<Language> find(@RequestParam(name = "Language") String name){
+
+        return ResponseEntity.ok()
+                .body(languageService.find(name));
+    }
 
   @GetMapping("/names")
   public ResponseEntity<List<Language>> getLanguagesName(){
@@ -74,8 +81,8 @@ public class LanguageControllerDB {
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteKey(@RequestParam String key){
+    @DeleteMapping("/delete/{key}")
+    public ResponseEntity<Void> deleteKey(@PathVariable String key){
         languageService.deleteKeys(key);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
