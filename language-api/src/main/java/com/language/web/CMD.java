@@ -20,9 +20,9 @@ public class CMD implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-        String key = "prop2";
-        languageService.deleteKeys(key);
-
+//        String key = "prop2";
+//        languageService.deleteKeys(key);
+//
         }
 
 

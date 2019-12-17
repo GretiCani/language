@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -81,14 +82,14 @@ public class LanguageControllerDB {
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
-    @DeleteMapping("/delete/{key}")
-    public ResponseEntity<Void> deleteKey(@PathVariable String key){
-        languageService.deleteKeys(key);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  @PostMapping(value = "/delete")
+  public ResponseEntity<Void> deleteKey(@RequestBody List<String> keys){
+      languageService.deleteKeys(keys);
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
   @PostMapping("/import")
-  public ResponseEntity<Void> importLanguage(@RequestParam String name,@RequestParam MultipartFile file)throws IOException {
+  public ResponseEntity<Void> importLanguage(@RequestParam String name,@RequestBody MultipartFile file)throws IOException {
       languageService.importLanguageCsv(name,file);
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }

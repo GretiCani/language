@@ -49,8 +49,10 @@ public class LanguageServiceImpl implements LanguageService {
     @Override
     public Language add(Language language) {
 
-        if(language.getName()!=null && !language.getName().equals(""))
-        return languageRepository.save(language);
+
+        if(language.getName()!=null && !language.getName().equals("")) {
+            return languageRepository.save(language);
+        }
         else {
             Language lang = languageRepository.findByName("english")
                     .orElseThrow(()->new ResourceNotFoundException(String
@@ -84,7 +86,21 @@ public class LanguageServiceImpl implements LanguageService {
     @Override
     public Language update(Language language) {
 
-        return languageRepository.save(language);
+        Language updateLang = languageRepository
+                .findByName(language.getName())
+                .orElseThrow(()->new ResourceNotFoundException("Language not found"));
+        Translation tempTrans = new Translation();
+        for (Translation translation : updateLang.getTranslations()){
+            if(translation.getKey().equals(language.getTranslations().get(0).getKey()))
+                tempTrans = translation;
+        }
+
+        if ( tempTrans.getKey() !=null && !tempTrans.getKey().equals("")) {
+            updateLang.getTranslations().remove(tempTrans);
+            updateLang.getTranslations().add(language.getTranslations().get(0));
+        }
+
+        return languageRepository.save(updateLang);
     }
 
     @Override
@@ -127,11 +143,14 @@ public class LanguageServiceImpl implements LanguageService {
     }
 
     @Override
-    public void deleteKeys(String key) {
-        Query query = new Query(Criteria.where("translations")
-                .elemMatch(Criteria.where("key").is(key)));
-        Update update = new Update().pull("translations",new Query(Criteria.where("key").is(key)));
-        mongoTemplate.updateMulti(query,update,Language.class);
+    public void deleteKeys(List<String> keys) {
+        keys.forEach(key->{
+            Query query = new Query(Criteria.where("translations")
+                    .elemMatch(Criteria.where("key").is(key)));
+            Update update = new Update().pull("translations",new Query(Criteria.where("key").is(key)));
+            mongoTemplate.updateMulti(query,update,Language.class);
+        });
+
     }
 
     private File convertMultiPartToFile(MultipartFile file) throws IOException {
