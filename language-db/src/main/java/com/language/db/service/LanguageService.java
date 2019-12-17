@@ -20,6 +20,6 @@ public interface LanguageService {
     Page<Translation> findPaginated(String namePageRequest, PageRequest pageRequest);
     List<Language> getLanguageNamesOnly();
     void importLanguageCsv(String languageName ,MultipartFile languageTranslation)throws IOException;
-    void deleteKeys(List<String> keys);
+    List<Language> deleteKeys(List<String> keys);
 
 }

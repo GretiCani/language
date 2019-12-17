@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,8 +33,9 @@ public class LanguageServiceImpl implements LanguageService {
 
     @Override
     public Language find(String name) {
-        return languageRepository.findByName(name)
+        Language language = languageRepository.findByName(name)
                 .orElseThrow(()->new ResourceNotFoundException(String.format("Language %s not found",name)));
+        return language;
     }
 
     @Override
@@ -143,7 +145,7 @@ public class LanguageServiceImpl implements LanguageService {
     }
 
     @Override
-    public void deleteKeys(List<String> keys) {
+    public List<Language> deleteKeys(List<String> keys) {
         keys.forEach(key->{
             Query query = new Query(Criteria.where("translations")
                     .elemMatch(Criteria.where("key").is(key)));
@@ -151,6 +153,7 @@ public class LanguageServiceImpl implements LanguageService {
             mongoTemplate.updateMulti(query,update,Language.class);
         });
 
+        return languageRepository.findAll();
     }
 
     private File convertMultiPartToFile(MultipartFile file) throws IOException {

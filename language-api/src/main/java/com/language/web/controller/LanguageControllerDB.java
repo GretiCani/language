@@ -63,7 +63,7 @@ public class LanguageControllerDB {
   }
 
   @PostMapping
-  public ResponseEntity<Void> add(@RequestBody @Valid Language language, UriComponentsBuilder builder){
+  public ResponseEntity<Language> add(@RequestBody @Valid Language language, UriComponentsBuilder builder){
       Language lang = languageService.add(language);
       HttpHeaders headers = new HttpHeaders();
       headers.setLocation(builder.path("/v1/language/{name}").buildAndExpand(lang.getName()).toUri());
@@ -83,9 +83,9 @@ public class LanguageControllerDB {
   }
 
   @PostMapping(value = "/delete")
-  public ResponseEntity<Void> deleteKey(@RequestBody List<String> keys){
-      languageService.deleteKeys(keys);
-      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  public ResponseEntity<List<Language>> deleteKey(@RequestBody List<String> keys){
+     List<Language>languages= languageService.deleteKeys(keys);
+      return ResponseEntity.ok().body(languages);
     }
 
   @PostMapping("/import")
